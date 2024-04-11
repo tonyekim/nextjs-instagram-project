@@ -1,9 +1,8 @@
-import React from 'react'
+import Feed from "@/components/Feed";
+import React from "react";
 
 const page = () => {
-  return (
-    <div className=' text-red-800'>page</div>
-  )
-}
+  return <Feed />;
+};
 
-export default page
+export default page;

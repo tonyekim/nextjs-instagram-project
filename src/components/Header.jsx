@@ -99,10 +99,10 @@ const Header = () => {
       <div className="flex justify-between items-center max-w-6xl mx-auto">
         {/* logo */}
         <Link href="/" className="hidden md:inline-flex">
-          <Image src={""} width={96} height={96} alt="logo" />
+          <Image  src='/Instagram_logo_black.webp' width={96} height={96} alt="logo" />
         </Link>
         <Link href="/" className="md:hidden">
-          <Image src={""} width={40} height={40} alt="logo" />
+          <Image   src='/800px-Instagram_logo_2016.webp' width={40} height={40} alt="logo" />
         </Link>
         {/* search inputs */}
 

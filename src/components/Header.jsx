@@ -13,14 +13,24 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
+import {
+  addDoc,
+  collection,
+  getFirestore,
+  serverTimestamp,
+} from "firebase/firestore";
 
 const Header = () => {
   const filePickerRef = useRef(null);
   const { data: session } = useSession();
+
   const [modalIsOpen, setIsOpen] = useState(false);
   const [file, setFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [imageFileUploading, setImageFileUploading] = useState(false);
+  const [postUploading, setPostUploading] = useState(false);
+  const [caption, setCaption] = useState("");
+  const db = getFirestore(app);
 
   function closeModal() {
     setIsOpen(false);
@@ -71,25 +81,28 @@ const Header = () => {
     );
   }
 
+  async function handleSubmit() {
+    setPostUploading(true);
+    const docRef = await addDoc(collection(db, "posts"), {
+      username: session.user.username,
+      caption,
+      profileImg: session.user.image,
+      image: imageFileUrl,
+      timestamp: serverTimestamp(),
+    });
+    setPostUploading(false);
+    setIsOpen(false);
+  }
+
   return (
     <div className="shadow-sm border-b sticky top-0 bg-white z-30 p-3">
       <div className="flex justify-between items-center max-w-6xl mx-auto">
         {/* logo */}
         <Link href="/" className="hidden md:inline-flex">
-          <Image
-            src={""}
-            width={96}
-            height={96}
-            alt="logo"
-          />
+          <Image src={""} width={96} height={96} alt="logo" />
         </Link>
         <Link href="/" className="md:hidden">
-          <Image
-            src={""}
-            width={40}
-            height={40}
-            alt="logo"
-          />
+          <Image src={""} width={40} height={40} alt="logo" />
         </Link>
         {/* search inputs */}
 
@@ -135,7 +148,9 @@ const Header = () => {
               onClick={() => setFile(null)}
               src={imageFileUrl}
               alt=""
-              className={`w-full max-h-[200px] object-cover cursor-pointer ${imageFileUploading ? "animate-pulse" : ""}`}
+              className={`w-full max-h-[200px] object-cover cursor-pointer ${
+                imageFileUploading ? "animate-pulse" : ""
+              }`}
             />
           ) : (
             <HiCamera
@@ -156,10 +171,19 @@ const Header = () => {
             maxLength="150"
             placeholder="Please enter you caption..."
             className="m-4 border-none text-center w-full focus:ring-0 outline-none"
-            // onChange={(e) => setCaption(e.target.value)}
+            onChange={(e) => setCaption(e.target.value)}
           />
 
-          <button className="w-full bg-red-600 text-white p-2 shadow-md rounded-lg hover:brightness-105 disabled:bg-gray-200 disabled:cursor-not-allowed disabled:hover:brightness-100">
+          <button
+            onClick={handleSubmit}
+            disabled={
+              !file ||
+              caption.trim() === "" ||
+              postUploading ||
+              imageFileUploading
+            }
+            className="w-full bg-red-600 text-white p-2 shadow-md rounded-lg hover:brightness-105 disabled:bg-gray-200 disabled:cursor-not-allowed disabled:hover:brightness-100"
+          >
             Upload Post
           </button>
 
